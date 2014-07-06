@@ -46,7 +46,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 
 import net.opengis.fes._2.AbstractQueryExpressionType;
-import net.opengis.fes._2.ObjectFactory;
 import net.opengis.fes._2.SpatialOperatorType;
 import net.opengis.fes._2.FilterType;
 import net.opengis.wfs.v_2_0_0.FeatureTypeType;
