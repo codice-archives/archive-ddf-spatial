@@ -159,8 +159,8 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
     private MetacardMapper metacardToFeatureMapper;
 
     public WfsFilterDelegate(FeatureMetacardType featureMetacardType,
-                             FilterCapabilities filterCapabilities, String srsName,
-                             MetacardMapper metacardToFeatureMapper, String coordinateOrder) {
+            FilterCapabilities filterCapabilities, String srsName,
+            MetacardMapper metacardToFeatureMapper, String coordinateOrder) {
 
         if (featureMetacardType == null) {
             throw new IllegalArgumentException("FeatureMetacardType can not be null");
@@ -384,7 +384,8 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
                             "Query with mix of feature ID and non-feature ID queries not supported");
                 }
                 if (isFeatureIdFilter) {
-                    List<JAXBElement<? extends AbstractIdType>> idFilterTypeList = filterType.getId();
+                    List<JAXBElement<? extends AbstractIdType>> idFilterTypeList = filterType
+                            .getId();
                     for (JAXBElement<? extends AbstractIdType> idFilter : idFilterTypeList) {
 
                         AbstractIdType absId = idFilter.getValue();
@@ -413,10 +414,9 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
     }
 
     private FilterType buildAndOrFilter(List<FilterType> filters,
-                                        JAXBElement<BinaryLogicOpType> andOrFilter) {
+            JAXBElement<BinaryLogicOpType> andOrFilter) {
 
         areLogicalOperationsSupported();
-
 
         if (filters == null || filters.isEmpty()) {
             return null;
@@ -462,7 +462,7 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
         if (null == filters || filters.isEmpty()) {
             return filters;
         }
-        
+
         String startDate = "";
         String endDate = "";
         String property = "";
@@ -473,8 +473,11 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
             if (null == filterType) {
                 continue;
             }
-            if (filterType.isSetTemporalOps() && (!isTemporalOpSupported(TEMPORAL_OPERATORS.Before) && !isTemporalOpSupported(TEMPORAL_OPERATORS.After)) && !isDuringFilter(filterType)) {
-                BinaryTemporalOpType binaryTemporalOpType = (BinaryTemporalOpType) filterType.getTemporalOps().getValue();
+            if (filterType.isSetTemporalOps() && (!isTemporalOpSupported(TEMPORAL_OPERATORS.Before)
+                    && !isTemporalOpSupported(TEMPORAL_OPERATORS.After)) && !isDuringFilter(
+                    filterType)) {
+                BinaryTemporalOpType binaryTemporalOpType = (BinaryTemporalOpType) filterType
+                        .getTemporalOps().getValue();
                 property = binaryTemporalOpType.getValueReference();
                 JAXBElement xp = binaryTemporalOpType.getExpression();
                 TimeInstantType obj = (TimeInstantType) xp.getValue();
@@ -490,16 +493,18 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
                 newFilters.add(filterType);
             }
         }
-        if (isTemporalOpSupported(TEMPORAL_OPERATORS.During) && (StringUtils.isNotEmpty(startDate))) {
+        if (isTemporalOpSupported(TEMPORAL_OPERATORS.During) && (StringUtils
+                .isNotEmpty(startDate))) {
             if (StringUtils.isEmpty(endDate)) {
                 endDate = convertDateToIso8601Format(new Date());
             }
-            FilterType duringFilter = buildDuringFilterType(featureMetacardType.getFeatureType().getLocalPart() + "." + property, startDate, endDate);
+            FilterType duringFilter = buildDuringFilterType(
+                    featureMetacardType.getFeatureType().getLocalPart() + "." + property, startDate,
+                    endDate);
             newFilters.add(duringFilter);
         }
         return newFilters;
     }
-
 
     private void removeEmptyFilters(List<FilterType> filters) {
         // Loop through the filters and remove any empty filters
@@ -585,7 +590,7 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
 
     @Override
     public FilterType propertyIsNotEqualTo(String propertyName, String literal,
-                                           boolean isCaseSensitive) {
+            boolean isCaseSensitive) {
         return buildPropertyIsFilterType(propertyName, literal,
                 PROPERTY_IS_OPS.PropertyIsNotEqualTo);
     }
@@ -796,12 +801,13 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
 
     @Override
     public FilterType propertyIsBetween(String propertyName, String lowerBoundary,
-                                        String upperBoundary) {
+            String upperBoundary) {
         return buildPropertyIsBetweenFilterType(propertyName, lowerBoundary, upperBoundary);
     }
 
     @Override
-    public FilterType propertyIsBetween(String propertyName, Date lowerBoundary, Date upperBoundary) {
+    public FilterType propertyIsBetween(String propertyName, Date lowerBoundary,
+            Date upperBoundary) {
         return buildPropertyIsBetweenFilterType(propertyName,
                 convertDateToIso8601Format(lowerBoundary),
                 convertDateToIso8601Format(upperBoundary));
@@ -828,7 +834,9 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
         List<FilterType> filterTypes = applyTemporalFallbacks(new ArrayList<FilterType>(
                 Arrays.asList(filterType)));
         if (filterTypes.isEmpty()) {
-           throw new IllegalArgumentException("Unable to create AfterFilter with property:[" + propertyName + "] and date:[" + date + "]");
+            throw new IllegalArgumentException(
+                    "Unable to create AfterFilter with property:[" + propertyName + "] and date:["
+                            + date + "]");
         }
         return filterTypes.get(0);
     }
@@ -846,30 +854,32 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
 
     @Override
     public FilterType propertyIsBetween(String propertyName, short lowerBoundary,
-                                        short upperBoundary) {
+            short upperBoundary) {
         return buildPropertyIsBetweenFilterType(propertyName, lowerBoundary, upperBoundary);
     }
 
     @Override
-    public FilterType propertyIsBetween(String propertyName, long lowerBoundary, long upperBoundary) {
+    public FilterType propertyIsBetween(String propertyName, long lowerBoundary,
+            long upperBoundary) {
         return buildPropertyIsBetweenFilterType(propertyName, lowerBoundary, upperBoundary);
     }
 
     @Override
     public FilterType propertyIsBetween(String propertyName, float lowerBoundary,
-                                        float upperBoundary) {
+            float upperBoundary) {
         return buildPropertyIsBetweenFilterType(propertyName, lowerBoundary, upperBoundary);
     }
 
     @Override
     public FilterType propertyIsBetween(String propertyName, double lowerBoundary,
-                                        double upperBoundary) {
+            double upperBoundary) {
         return buildPropertyIsBetweenFilterType(propertyName, lowerBoundary, upperBoundary);
     }
 
     protected boolean isAfterFilter(FilterType filter) {
         if (isFilterSet(filter)) {
-            return TEMPORAL_OPERATORS.After.toString().equals(filter.getTemporalOps().getName().getLocalPart());
+            return TEMPORAL_OPERATORS.After.toString()
+                    .equals(filter.getTemporalOps().getName().getLocalPart());
         } else {
             return false;
         }
@@ -877,7 +887,8 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
 
     protected boolean isBeforeFilter(FilterType filter) {
         if (isFilterSet(filter)) {
-            return TEMPORAL_OPERATORS.Before.toString().equals(filter.getTemporalOps().getName().getLocalPart());
+            return TEMPORAL_OPERATORS.Before.toString()
+                    .equals(filter.getTemporalOps().getName().getLocalPart());
         } else {
             return false;
         }
@@ -885,14 +896,15 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
 
     protected boolean isDuringFilter(FilterType filter) {
         if (isFilterSet(filter)) {
-            return TEMPORAL_OPERATORS.During.toString().equals(filter.getTemporalOps().getName().getLocalPart());
+            return TEMPORAL_OPERATORS.During.toString()
+                    .equals(filter.getTemporalOps().getName().getLocalPart());
         } else {
             return false;
         }
     }
 
     private FilterType buildPropertyIsBetweenFilterType(String propertyName, Object lowerBoundary,
-                                                        Object upperBoundary) {
+            Object upperBoundary) {
 
         if (!isValidInputParameters(propertyName, lowerBoundary, upperBoundary)) {
             throw new IllegalArgumentException(MISSING_PARAMETERS_MSG);
@@ -905,7 +917,8 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
                     .getAttributeDescriptor(propertyName);
             if (featureAttributeDescriptor.isIndexed()) {
                 filter.setComparisonOps(createPropertyIsBetween(
-                        featureAttributeDescriptor.getPropertyName(), lowerBoundary, upperBoundary));
+                        featureAttributeDescriptor.getPropertyName(), lowerBoundary,
+                        upperBoundary));
             } else {
                 throw new IllegalArgumentException(String.format(PROPERTY_NOT_QUERYABLE,
                         propertyName));
@@ -916,7 +929,8 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
         return filter;
     }
 
-    private FilterType buildDuringFilterType(String propertyName, String startDate, String endDate) {
+    private FilterType buildDuringFilterType(String propertyName, String startDate,
+            String endDate) {
 
         if (!isTemporalOpSupported(TEMPORAL_OPERATORS.During)) {
             throw new UnsupportedOperationException(
@@ -924,10 +938,12 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
         }
 
         TemporalOperand timePeriodTemporalOperand = new TemporalOperand();
-        timePeriodTemporalOperand.setName(new QName(Wfs20Constants.GML_3_2_NAMESPACE, Wfs20Constants.TIME_PERIOD));
+        timePeriodTemporalOperand
+                .setName(new QName(Wfs20Constants.GML_3_2_NAMESPACE, Wfs20Constants.TIME_PERIOD));
         if (!isTemporalOperandSupported(timePeriodTemporalOperand)) {
             throw new UnsupportedOperationException(
-                    "Temporal Operand [" + timePeriodTemporalOperand.getName() + "] is not supported.");
+                    "Temporal Operand [" + timePeriodTemporalOperand.getName()
+                            + "] is not supported.");
         }
 
         if (!isValidInputParameters(propertyName, startDate, endDate)) {
@@ -946,7 +962,8 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
                     .getAttributeDescriptor(propertyName);
             if (featureAttributeDescriptor.isIndexed()) {
                 filter.setTemporalOps(createDuring(
-                        featureAttributeDescriptor.getPropertyName(), featureMetacardType.getName(), startDate, endDate));
+                        featureAttributeDescriptor.getPropertyName(), featureMetacardType.getName(),
+                        startDate, endDate));
             } else {
                 throw new IllegalArgumentException(String.format(PROPERTY_NOT_QUERYABLE,
                         propertyName));
@@ -964,7 +981,8 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
                 new QName(Wfs20Constants.GML_3_2_NAMESPACE, Wfs20Constants.TIME_INSTANT));
         if (!isTemporalOperandSupported(timeInstantTemporalOperand)) {
             throw new UnsupportedOperationException(
-                    "Temporal Operand [" + timeInstantTemporalOperand.getName() + "] is not supported.");
+                    "Temporal Operand [" + timeInstantTemporalOperand.getName()
+                            + "] is not supported.");
         }
 
         if (!isValidInputParameters(propertyName, date)) {
@@ -983,7 +1001,8 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
                     .getAttributeDescriptor(propertyName);
             if (featureAttributeDescriptor.isIndexed()) {
                 filter.setTemporalOps(createAfter(
-                        featureAttributeDescriptor.getPropertyName(), featureMetacardType.getName(), date));
+                        featureAttributeDescriptor.getPropertyName(), featureMetacardType.getName(),
+                        date));
             } else {
                 throw new IllegalArgumentException(String.format(PROPERTY_NOT_QUERYABLE,
                         propertyName));
@@ -998,10 +1017,12 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
     private FilterType buildBeforeFilterType(String propertyName, String date) {
 
         TemporalOperand timeInstantTemporalOperand = new TemporalOperand();
-        timeInstantTemporalOperand.setName(new QName(Wfs20Constants.GML_3_2_NAMESPACE, Wfs20Constants.TIME_INSTANT));
+        timeInstantTemporalOperand
+                .setName(new QName(Wfs20Constants.GML_3_2_NAMESPACE, Wfs20Constants.TIME_INSTANT));
         if (!isTemporalOperandSupported(timeInstantTemporalOperand)) {
             throw new UnsupportedOperationException(
-                    "Temporal Operand [" + timeInstantTemporalOperand.getName() + "] is not supported.");
+                    "Temporal Operand [" + timeInstantTemporalOperand.getName()
+                            + "] is not supported.");
         }
 
         if (!isValidInputParameters(propertyName, date)) {
@@ -1020,7 +1041,8 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
                     .getAttributeDescriptor(propertyName);
             if (featureAttributeDescriptor.isIndexed()) {
                 filter.setTemporalOps(createBefore(
-                        featureAttributeDescriptor.getPropertyName(), featureMetacardType.getName(), date));
+                        featureAttributeDescriptor.getPropertyName(), featureMetacardType.getName(),
+                        date));
             } else {
                 throw new IllegalArgumentException(String.format(PROPERTY_NOT_QUERYABLE,
                         propertyName));
@@ -1033,7 +1055,7 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
     }
 
     private FilterType buildPropertyIsFilterType(String propertyName, Object literal,
-                                                 PROPERTY_IS_OPS propertyIsType) {
+            PROPERTY_IS_OPS propertyIsType) {
         if (!isValidInputParameters(propertyName, literal)) {
             throw new IllegalArgumentException(MISSING_PARAMETERS_MSG);
         }
@@ -1057,7 +1079,8 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
                     returnFilter.setComparisonOps(createPropertyIsFilter(
                             attrDescriptor.getPropertyName(), literal, propertyIsType));
                 } else {
-                    LOGGER.debug("All textual properties have been blacklisted.  Removing from query.");
+                    LOGGER.debug(
+                            "All textual properties have been blacklisted.  Removing from query.");
                     return null;
                 }
             } else {
@@ -1078,7 +1101,8 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
                 if (!binaryCompOpsToBeOred.isEmpty()) {
                     returnFilter = or(binaryCompOpsToBeOred);
                 } else {
-                    LOGGER.debug("All textual properties have been blacklisted.  Removing from query.");
+                    LOGGER.debug(
+                            "All textual properties have been blacklisted.  Removing from query.");
                     return null;
                 }
             }
@@ -1116,76 +1140,76 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
     }
 
     private JAXBElement<? extends ComparisonOpsType> createPropertyIsFilter(String property,
-                                                                            Object literal, PROPERTY_IS_OPS operation) {
+            Object literal, PROPERTY_IS_OPS operation) {
         switch (operation) {
-            case PropertyIsEqualTo:
-                JAXBElement<BinaryComparisonOpType> propIsEqualTo = filterObjectFactory
-                        .createPropertyIsEqualTo(new BinaryComparisonOpType());
-                propIsEqualTo.getValue().getExpression().add(createPropertyNameType(property));
-                propIsEqualTo.getValue().getExpression().add(createLiteralType(literal));
+        case PropertyIsEqualTo:
+            JAXBElement<BinaryComparisonOpType> propIsEqualTo = filterObjectFactory
+                    .createPropertyIsEqualTo(new BinaryComparisonOpType());
+            propIsEqualTo.getValue().getExpression().add(createPropertyNameType(property));
+            propIsEqualTo.getValue().getExpression().add(createLiteralType(literal));
 
-                return propIsEqualTo;
+            return propIsEqualTo;
 
-            case PropertyIsNotEqualTo:
-                JAXBElement<BinaryComparisonOpType> propIsNotEqualTo = filterObjectFactory
-                        .createPropertyIsNotEqualTo(new BinaryComparisonOpType());
-                propIsNotEqualTo.getValue().getExpression().add(createPropertyNameType(property));
-                propIsNotEqualTo.getValue().getExpression().add(createLiteralType(literal));
+        case PropertyIsNotEqualTo:
+            JAXBElement<BinaryComparisonOpType> propIsNotEqualTo = filterObjectFactory
+                    .createPropertyIsNotEqualTo(new BinaryComparisonOpType());
+            propIsNotEqualTo.getValue().getExpression().add(createPropertyNameType(property));
+            propIsNotEqualTo.getValue().getExpression().add(createLiteralType(literal));
 
-                return propIsNotEqualTo;
+            return propIsNotEqualTo;
 
-            case PropertyIsGreaterThan:
-                JAXBElement<BinaryComparisonOpType> propIsGreaterThan = filterObjectFactory
-                        .createPropertyIsGreaterThan(new BinaryComparisonOpType());
-                propIsGreaterThan.getValue().getExpression().add(createPropertyNameType(property));
-                propIsGreaterThan.getValue().getExpression().add(createLiteralType(literal));
+        case PropertyIsGreaterThan:
+            JAXBElement<BinaryComparisonOpType> propIsGreaterThan = filterObjectFactory
+                    .createPropertyIsGreaterThan(new BinaryComparisonOpType());
+            propIsGreaterThan.getValue().getExpression().add(createPropertyNameType(property));
+            propIsGreaterThan.getValue().getExpression().add(createLiteralType(literal));
 
-                return propIsGreaterThan;
+            return propIsGreaterThan;
 
-            case PropertyIsGreaterThanOrEqualTo:
-                JAXBElement<BinaryComparisonOpType> propIsGreaterThanOrEqualTo = filterObjectFactory
-                        .createPropertyIsGreaterThanOrEqualTo(new BinaryComparisonOpType());
-                propIsGreaterThanOrEqualTo.getValue().getExpression()
-                        .add(createPropertyNameType(property));
-                propIsGreaterThanOrEqualTo.getValue().getExpression().add(createLiteralType(literal));
+        case PropertyIsGreaterThanOrEqualTo:
+            JAXBElement<BinaryComparisonOpType> propIsGreaterThanOrEqualTo = filterObjectFactory
+                    .createPropertyIsGreaterThanOrEqualTo(new BinaryComparisonOpType());
+            propIsGreaterThanOrEqualTo.getValue().getExpression()
+                    .add(createPropertyNameType(property));
+            propIsGreaterThanOrEqualTo.getValue().getExpression().add(createLiteralType(literal));
 
-                return propIsGreaterThanOrEqualTo;
+            return propIsGreaterThanOrEqualTo;
 
-            case PropertyIsLessThan:
-                JAXBElement<BinaryComparisonOpType> propIsLessThan = filterObjectFactory
-                        .createPropertyIsLessThan(new BinaryComparisonOpType());
-                propIsLessThan.getValue().getExpression().add(createPropertyNameType(property));
-                propIsLessThan.getValue().getExpression().add(createLiteralType(literal));
+        case PropertyIsLessThan:
+            JAXBElement<BinaryComparisonOpType> propIsLessThan = filterObjectFactory
+                    .createPropertyIsLessThan(new BinaryComparisonOpType());
+            propIsLessThan.getValue().getExpression().add(createPropertyNameType(property));
+            propIsLessThan.getValue().getExpression().add(createLiteralType(literal));
 
-                return propIsLessThan;
+            return propIsLessThan;
 
-            case PropertyIsLessThanOrEqualTo:
-                JAXBElement<BinaryComparisonOpType> propIsLessThanOrEqualTo = filterObjectFactory
-                        .createPropertyIsLessThanOrEqualTo(new BinaryComparisonOpType());
-                propIsLessThanOrEqualTo.getValue().getExpression()
-                        .add(createPropertyNameType(property));
-                propIsLessThanOrEqualTo.getValue().getExpression().add(createLiteralType(literal));
+        case PropertyIsLessThanOrEqualTo:
+            JAXBElement<BinaryComparisonOpType> propIsLessThanOrEqualTo = filterObjectFactory
+                    .createPropertyIsLessThanOrEqualTo(new BinaryComparisonOpType());
+            propIsLessThanOrEqualTo.getValue().getExpression()
+                    .add(createPropertyNameType(property));
+            propIsLessThanOrEqualTo.getValue().getExpression().add(createLiteralType(literal));
 
-                return propIsLessThanOrEqualTo;
+            return propIsLessThanOrEqualTo;
 
-            case PropertyIsLike:
-                JAXBElement<PropertyIsLikeType> propIsLike = filterObjectFactory
-                        .createPropertyIsLike(new PropertyIsLikeType());
+        case PropertyIsLike:
+            JAXBElement<PropertyIsLikeType> propIsLike = filterObjectFactory
+                    .createPropertyIsLike(new PropertyIsLikeType());
 
-                propIsLike.getValue().setEscapeChar(Wfs20Constants.ESCAPE);
-                propIsLike.getValue().setSingleChar(SINGLE_CHAR);
-                propIsLike.getValue().setWildCard(Wfs20Constants.WILD_CARD);
-                propIsLike.getValue().getExpression().add(createLiteralType(literal));
-                propIsLike.getValue().getExpression().add(createPropertyNameType(property));
-                return propIsLike;
+            propIsLike.getValue().setEscapeChar(Wfs20Constants.ESCAPE);
+            propIsLike.getValue().setSingleChar(SINGLE_CHAR);
+            propIsLike.getValue().setWildCard(Wfs20Constants.WILD_CARD);
+            propIsLike.getValue().getExpression().add(createLiteralType(literal));
+            propIsLike.getValue().getExpression().add(createPropertyNameType(property));
+            return propIsLike;
 
-            default:
-                throw new UnsupportedOperationException("Unsupported Property Comparison Type");
+        default:
+            throw new UnsupportedOperationException("Unsupported Property Comparison Type");
         }
     }
 
     private JAXBElement<PropertyIsBetweenType> createPropertyIsBetween(String property,
-                                                                       Object lowerBoundary, Object upperBoundary) {
+            Object lowerBoundary, Object upperBoundary) {
         PropertyIsBetweenType propertyIsBetween = new PropertyIsBetweenType();
         propertyIsBetween.setLowerBoundary(createLowerBoundary(lowerBoundary));
         propertyIsBetween.setUpperBoundary(createUpperBoundary(upperBoundary));
@@ -1195,28 +1219,28 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
     }
 
     private JAXBElement<BinaryTemporalOpType> createDuring(String property, String type,
-                                                           String startDate, String endDate) {
+            String startDate, String endDate) {
         JAXBElement<BinaryTemporalOpType> during = filterObjectFactory
                 .createDuring(createBinaryTemporalOpType(property, type, startDate, endDate));
         return during;
     }
 
     private JAXBElement<BinaryTemporalOpType> createAfter(String property, String type,
-                                                          String date) {
+            String date) {
         JAXBElement<BinaryTemporalOpType> after = filterObjectFactory
                 .createAfter(createBinaryTemporalOpType(property, type, date));
         return after;
     }
 
     private JAXBElement<BinaryTemporalOpType> createBefore(String property, String type,
-                                                           String date) {
+            String date) {
         JAXBElement<BinaryTemporalOpType> before = filterObjectFactory
                 .createBefore(createBinaryTemporalOpType(property, type, date));
         return before;
     }
 
     private BinaryTemporalOpType createBinaryTemporalOpType(String property, String type,
-                                                            String startDate, String endDate) {
+            String startDate, String endDate) {
         BinaryTemporalOpType binaryTemporalOpType = filterObjectFactory
                 .createBinaryTemporalOpType();
         binaryTemporalOpType.setValueReference(property);
@@ -1227,7 +1251,7 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
     }
 
     private BinaryTemporalOpType createBinaryTemporalOpType(String property, String type,
-                                                            String date) {
+            String date) {
         BinaryTemporalOpType binaryTemporalOpType = filterObjectFactory
                 .createBinaryTemporalOpType();
         binaryTemporalOpType.setValueReference(property);
@@ -1245,7 +1269,7 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
     }
 
     private TimePeriodType createTimePeriodType(String property, String type, String startDate,
-                                                String endDate) {
+            String endDate) {
 
         TimePeriodType timePeriodType = gml320ObjectFactory.createTimePeriodType();
         timePeriodType.setBeginPosition(createTimePositionType(startDate));
@@ -1287,7 +1311,7 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
     }
 
     private boolean isValidInputParameters(String propertyName, Object lowerBoundary,
-                                           Object upperBoundary) {
+            Object upperBoundary) {
 
         if (lowerBoundary == null || upperBoundary == null) {
             return false;
@@ -1423,7 +1447,8 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
             String bufferedWkt = bufferGeometry(wkt, distance);
             return intersects(propertyName, bufferedWkt);
         } else {
-            LOGGER.debug("WFS Source does not support the DWithin filter or any of its fallback filters (Not Beyond or Intersects).");
+            LOGGER.debug(
+                    "WFS Source does not support the DWithin filter or any of its fallback filters (Not Beyond or Intersects).");
             return null;
         }
     }
@@ -1531,7 +1556,7 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
     }
 
     private FilterType buildGeospatialFilterType(String spatialOpType, String propertyName,
-                                                 String wkt, Double distance) {
+            String wkt, Double distance) {
         FilterType returnFilter = new FilterType();
         if (Metacard.ANY_GEO.equals(propertyName)) {
 
@@ -1592,47 +1617,49 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
     }
 
     private JAXBElement<? extends SpatialOpsType> createSpatialOpType(String operation,
-                                                                      String propertyName, String wkt, Double distance) {
+            String propertyName, String wkt, Double distance) {
 
         switch (SPATIAL_OPERATORS.valueOf(operation)) {
-            case BBOX:
-                return buildBBoxType(propertyName, wkt);
-            case Beyond:
-                return buildDistanceBufferType(
-                        filterObjectFactory.createBeyond(new DistanceBufferType()), propertyName, wkt,
-                        distance);
-            case Contains:
-                return buildBinarySpatialOpType(
-                        filterObjectFactory.createContains(new BinarySpatialOpType()), propertyName,
-                        wkt);
-            case Crosses:
-                return buildBinarySpatialOpType(
-                        filterObjectFactory.createCrosses(new BinarySpatialOpType()), propertyName, wkt);
-            case Disjoint:
-                return buildBinarySpatialOpType(
-                        filterObjectFactory.createDisjoint(new BinarySpatialOpType()), propertyName,
-                        wkt);
-            case DWithin:
-                return buildDistanceBufferType(
-                        filterObjectFactory.createDWithin(new DistanceBufferType()), propertyName, wkt,
-                        distance);
-            case Intersects:
-                return buildBinarySpatialOpType(
-                        filterObjectFactory.createIntersects(new BinarySpatialOpType()), propertyName,
-                        wkt);
-            case Overlaps:
-                return buildBinarySpatialOpType(
-                        filterObjectFactory.createOverlaps(new BinarySpatialOpType()), propertyName,
-                        wkt);
-            case Touches:
-                return buildBinarySpatialOpType(
-                        filterObjectFactory.createTouches(new BinarySpatialOpType()), propertyName, wkt);
-            case Within:
-                return buildBinarySpatialOpType(
-                        filterObjectFactory.createWithin(new BinarySpatialOpType()), propertyName, wkt);
-            default:
-                throw new UnsupportedOperationException("Unsupported geospatial filter type "
-                        + SPATIAL_OPERATORS.valueOf(operation) + " specified");
+        case BBOX:
+            return buildBBoxType(propertyName, wkt);
+        case Beyond:
+            return buildDistanceBufferType(
+                    filterObjectFactory.createBeyond(new DistanceBufferType()), propertyName, wkt,
+                    distance);
+        case Contains:
+            return buildBinarySpatialOpType(
+                    filterObjectFactory.createContains(new BinarySpatialOpType()), propertyName,
+                    wkt);
+        case Crosses:
+            return buildBinarySpatialOpType(
+                    filterObjectFactory.createCrosses(new BinarySpatialOpType()), propertyName,
+                    wkt);
+        case Disjoint:
+            return buildBinarySpatialOpType(
+                    filterObjectFactory.createDisjoint(new BinarySpatialOpType()), propertyName,
+                    wkt);
+        case DWithin:
+            return buildDistanceBufferType(
+                    filterObjectFactory.createDWithin(new DistanceBufferType()), propertyName, wkt,
+                    distance);
+        case Intersects:
+            return buildBinarySpatialOpType(
+                    filterObjectFactory.createIntersects(new BinarySpatialOpType()), propertyName,
+                    wkt);
+        case Overlaps:
+            return buildBinarySpatialOpType(
+                    filterObjectFactory.createOverlaps(new BinarySpatialOpType()), propertyName,
+                    wkt);
+        case Touches:
+            return buildBinarySpatialOpType(
+                    filterObjectFactory.createTouches(new BinarySpatialOpType()), propertyName,
+                    wkt);
+        case Within:
+            return buildBinarySpatialOpType(
+                    filterObjectFactory.createWithin(new BinarySpatialOpType()), propertyName, wkt);
+        default:
+            throw new UnsupportedOperationException("Unsupported geospatial filter type "
+                    + SPATIAL_OPERATORS.valueOf(operation) + " specified");
         }
 
     }
@@ -1662,7 +1689,8 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
         try {
             bboxType.setAny(createEnvelope(getGeometryFromWkt(wkt)));
         } catch (ParseException e) {
-            throw new UnsupportedOperationException("Unable to parse WKT Geometry [" + wkt + "]", e);
+            throw new UnsupportedOperationException("Unable to parse WKT Geometry [" + wkt + "]",
+                    e);
         }
         return filterObjectFactory.createBBOX(bboxType);
     }
@@ -1927,7 +1955,8 @@ public class WfsFilterDelegate extends FilterDelegate<FilterType> {
     private String convertWktToLatLonOrdering(String wktInLonLat) {
 
         if (Wfs20Constants.LAT_LON_ORDER.equals(coordinateOrder)) {
-            LOGGER.debug("Converting WKT from LON/LAT coordinate ordering to LAT/LON coordinate ordering.");
+            LOGGER.debug(
+                    "Converting WKT from LON/LAT coordinate ordering to LAT/LON coordinate ordering.");
 
             // Normalize all whitespace in WKT before processing.
             wktInLonLat = normalizeWhitespaceInWkt(wktInLonLat);
