@@ -1,5 +1,5 @@
 Copyright (c) Codice Foundation
-:imagesdir: images
+:imagesdir: target/docs/images
 :toc: right
 :branding: DDF
 :audience: Developer
