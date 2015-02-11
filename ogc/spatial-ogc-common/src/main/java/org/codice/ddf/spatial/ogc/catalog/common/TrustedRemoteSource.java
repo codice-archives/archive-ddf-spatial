@@ -15,38 +15,21 @@
 
 package org.codice.ddf.spatial.ogc.catalog.common;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.ws.rs.core.Cookie;
-
-import org.apache.commons.io.IOUtils;
+import ddf.security.settings.SecuritySettingsService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
-import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
-import org.apache.cxf.configuration.security.FiltersType;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
@@ -56,38 +39,20 @@ import org.apache.cxf.jaxrs.client.ClientConfiguration;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.rs.security.saml.DeflateEncoderDecoder;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.https.HttpsURLConnectionFactory;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ddf.security.PropertiesLoader;
-import ddf.security.Subject;
-import ddf.security.assertion.SecurityAssertion;
 import ddf.security.sts.client.configuration.STSClientConfiguration;
 
 public abstract class TrustedRemoteSource {
     
     public static final String DISABLE_CN_CHECK_PROPERTY = "disableCnCheck";
-
-    protected static final String[] SSL_ALLOWED_ALGORITHMS =
-            {
-                    ".*_WITH_AES_.*"
-            };
-
-    protected static final String[] SSL_DISALLOWED_ALGORITHMS =
-            {
-                    ".*_WITH_NULL_.*", ".*_DH_anon_.*"
-            };
-
-    protected static final String SAML_COOKIE_NAME = "org.codice.websso.saml.token";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrustedRemoteSource.class);
 
@@ -107,14 +72,7 @@ public abstract class TrustedRemoteSource {
     
     protected HashMap<String, String> wsdlSuffixMap = new HashMap<String, String>();
 
-    // SSL keystores and passwords
-    protected String trustStorePath;
-
-    protected String keyStorePath;
-
-    protected String trustStorePassword;
-
-    protected String keyStorePassword;
+    protected SecuritySettingsService securitySettingsService;
 
     /**
      * Configures the connection and receive timeouts. If any of the parameters are null, the timeouts
@@ -162,154 +120,6 @@ public abstract class TrustedRemoteSource {
         }
 
         httpConduit.setClient(httpClientPolicy);
-    }
-
-
-
-    /**
-     * Configures the client keystores. If any of the paramters are null, that keystore will be set
-     * to the system default.
-     *
-     * @param client             Client used for outgoing requests.
-     * @param keyStorePath       Path to the keystore that should be used.
-     * @param keyStorePassword   Password for the keystore.
-     * @param trustStorePath     Path to the truststore that should be used.
-     * @param trustStorePassword Password for the truststore.
-     */
-    protected void configureKeystores(Client client, String keyStorePath, String keyStorePassword,
-            String trustStorePath, String trustStorePassword) {
-        ClientConfiguration clientConfiguration = WebClient.getConfig(client);
-
-        HTTPConduit httpConduit = clientConfiguration.getHttpConduit();
-        if (httpConduit == null) {
-            LOGGER.info("HTTPConduit was null for {}. Unable to configure keystores.", client);
-            return;
-        }
-        configureKeystores(httpConduit, keyStorePath, keyStorePassword, trustStorePath, trustStorePassword);
-    }
-    
-    private void configureKeystores(HTTPConduit httpConduit, String keyStorePath, String keyStorePassword,
-            String trustStorePath, String trustStorePassword) {
-
-        LOGGER.debug("Setting keyStore/trustStore paths/passwords");
-        this.keyStorePath = keyStorePath;
-        this.keyStorePassword = keyStorePassword;
-        this.trustStorePath = trustStorePath;
-        this.trustStorePassword = trustStorePassword;
-
-        TLSClientParameters tlsParams = httpConduit.getTlsClientParameters();
-
-        try {
-            if (tlsParams == null) {
-                tlsParams = new TLSClientParameters();
-            }
-            
-            tlsParams.setDisableCNCheck(true);
-
-            // the default type is JKS
-            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-
-            // add the trustStore if it exists
-            if (StringUtils.isNotEmpty(trustStorePath)) {
-                File trustStoreFile = new File(trustStorePath);
-                if (trustStoreFile.exists() && trustStorePassword != null) {
-                    FileInputStream fis = new FileInputStream(trustStoreFile);
-                    try {
-                        LOGGER.debug("Loading trustStore");
-                        if (StringUtils.isNotEmpty(trustStorePassword)) {
-                            trustStore.load(fis, trustStorePassword.toCharArray());
-                        } else {
-                            LOGGER.debug(
-                                    "No password found, trying to load trustStore with no password.");
-                            trustStore.load(fis, null);
-                        }
-                    } catch (IOException e) {
-                        LOGGER.error("Unable to load truststore. {}", trustStoreFile, e);
-                    } catch (CertificateException e) {
-                        LOGGER.error("Unable to load certificates from keystore. {}",
-                                trustStoreFile, e);
-                    } finally {
-                        IOUtils.closeQuietly(fis);
-                    }
-                    TrustManagerFactory trustFactory = TrustManagerFactory
-                            .getInstance(TrustManagerFactory
-                                    .getDefaultAlgorithm());
-                    trustFactory.init(trustStore);
-                    LOGGER.debug("trust manager factory initialized");
-                    TrustManager[] tm = trustFactory.getTrustManagers();
-                    tlsParams.setTrustManagers(tm);
-                } else {
-                    tlsParams.setTrustManagers(null);
-                    LOGGER.debug(
-                            "TrustStore file does not exist or no password was set, using system default.");
-                }
-            } else {
-                tlsParams.setTrustManagers(null);
-                LOGGER.debug(
-                        "TrustStore path was passed in as null or empty, using system default");
-            }
-
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-
-            // add the keyStore if it exists
-            if(StringUtils.isNotEmpty(keyStorePath)) {
-                File keyStoreFile = new File(keyStorePath);
-                if (keyStoreFile.exists()) {
-                    FileInputStream fis = new FileInputStream(keyStoreFile);
-                    try {
-                        LOGGER.debug("Loading keyStore");
-                        if(StringUtils.isNotEmpty(keyStorePassword)) {
-                            keyStore.load(fis, keyStorePassword.toCharArray());
-                        } else {
-                            LOGGER.debug(
-                                    "No password found, trying to load keyStore with no password.");
-                            keyStore.load(fis, null);
-                        }
-                    } catch (IOException e) {
-                        LOGGER.error("Unable to load keystore. {}", keyStoreFile, e);
-                    } catch (CertificateException e) {
-                        LOGGER.error("Unable to load certificates from keystore. {}", keyStoreFile,
-                                e);
-                    } finally {
-                        IOUtils.closeQuietly(fis);
-                    }
-                    KeyManagerFactory keyFactory = KeyManagerFactory.getInstance(KeyManagerFactory
-                            .getDefaultAlgorithm());
-                    keyFactory.init(keyStore, keyStorePassword.toCharArray());
-                    LOGGER.debug("key manager factory initialized");
-                    KeyManager[] km = keyFactory.getKeyManagers();
-                    tlsParams.setKeyManagers(km);
-                } else {
-                    LOGGER.debug(
-                            "Keystore path or password were not passed in, using system defaults.");
-                    tlsParams.setKeyManagers(null);
-                }
-            } else {
-                LOGGER.debug(
-                        "Keystore path was passed in as null or empty, using system defaults.");
-                tlsParams.setKeyManagers(null);
-            }
-
-            // this sets the algorithms that we accept for SSL
-            FiltersType filter = new FiltersType();
-            filter.getInclude().addAll(Arrays.asList(SSL_ALLOWED_ALGORITHMS));
-            filter.getExclude().addAll(Arrays.asList(SSL_DISALLOWED_ALGORITHMS));
-            tlsParams.setCipherSuitesFilter(filter);
-            
-            httpConduit.setTlsClientParameters(tlsParams);
-
-        } catch (KeyStoreException e) {
-            LOGGER.error("Unable to read keystore: ", e);
-        } catch (NoSuchAlgorithmException e) {
-            LOGGER.error("Problems creating SSL socket. Usually this is "
-                            + "referring to the certificate sent by the server not being trusted by the client.",
-                    e);
-        } catch (FileNotFoundException e) {
-            LOGGER.error("Unable to locate one of the SSL stores: {} | {}", trustStorePath,
-                    keyStorePath, e);
-        } catch (UnrecoverableKeyException e) {
-            LOGGER.error("Unable to read keystore: ", e);
-        }
     }
     
     /**
@@ -427,93 +237,6 @@ public abstract class TrustedRemoteSource {
 
         params.setDisableCNCheck(true);
     }
-
-    /**
-     * Sets a subject cookie on a {@link org.apache.cxf.jaxrs.client.WebClient} and returns the
-     * resulting client.
-     * @param client - {@link org.apache.cxf.jaxrs.client.Client} to update
-     * @param subject - {@link ddf.security.Subject} to inject
-     * @return {@link org.apache.cxf.jaxrs.client.WebClient}
-     */
-    protected void setSubjectOnRequest(Client client, Subject subject) {
-        if(subject != null) {
-            Cookie cookie = createSamlCookie(subject);
-            if (cookie == null) {
-                LOGGER.info("SAML Cookie was null. Unable to set the cookie for the client.");
-                return;
-            }
-            client.reset();
-            client.cookie(cookie);
-        }
-    }
-
-    /**
-     * Creates a cookie to be returned to the browser if the token was successfully exchanged for
-     * a SAML assertion.
-     *
-     * @param subject - {@link ddf.security.Subject} to create the cookie from
-     */
-    private Cookie createSamlCookie(Subject subject) {
-        Cookie cookie = null;
-        org.w3c.dom.Element samlToken = null;
-        try {
-            for (Object principal : subject.getPrincipals().asList()) {
-                if (principal instanceof SecurityAssertion) {
-                    samlToken = ((SecurityAssertion) principal).getSecurityToken()
-                            .getToken();
-                }
-            }
-            if (samlToken != null) {
-                cookie = new Cookie(SAML_COOKIE_NAME, encodeSaml(samlToken));
-            }
-        } catch (WSSecurityException e) {
-            LOGGER.error("Unable to parse SAML assertion from subject.", e);
-        }
-        return cookie;
-    }
-
-    /**
-     * Encodes the SAML assertion as a deflated Base64 String so that it can be used as a Cookie.
-     *
-     * @param token
-     * @return String
-     * @throws WSSecurityException
-     */
-    protected  String encodeSaml(org.w3c.dom.Element token) throws WSSecurityException {
-        AssertionWrapper assertion = new AssertionWrapper(token);
-        String samlStr = assertion.assertionToString();
-        DeflateEncoderDecoder deflateEncoderDecoder = new DeflateEncoderDecoder();
-        byte[] deflatedToken = deflateEncoderDecoder.deflateToken(samlStr.getBytes());
-        return Base64Utility.encode(deflatedToken);
-    }
-    
-    public void setSAMLAssertion(Client client, STSClientConfiguration stsClientConfig) {
-        LOGGER.debug("ENTERING: setSAMLAssertion()");
-        if (stsClientConfig == null || StringUtils.isBlank(stsClientConfig.getAddress())) {
-            LOGGER.debug("STSClientConfiguration is either null or its address is blank - assuming no STS Client is configured, so no SAML assertion will get generated.");
-            return;
-        }
-        ClientConfiguration clientConfig = WebClient.getConfig(client);
-        Bus bus = clientConfig.getBus();
-        STSClient stsClient = configureSTSClient(bus, stsClientConfig);
-        stsClient.setTokenType(stsClientConfig.getAssertionType());
-        stsClient.setKeyType(stsClientConfig.getKeyType());
-        stsClient.setKeySize(Integer.valueOf(stsClientConfig.getKeySize()));
-        try {
-            SecurityToken securityToken = stsClient.requestSecurityToken(stsClientConfig.getAddress());
-            org.w3c.dom.Element samlToken = securityToken.getToken();
-            if (samlToken != null) {
-                Cookie cookie = new Cookie(SAML_COOKIE_NAME, encodeSaml(samlToken));
-                client.reset();
-                client.cookie(cookie);
-            } else {
-                LOGGER.debug("Attempt to retrieve SAML token resulted in null token - could not add token to request");
-            }
-        } catch (Exception e) {
-            LOGGER.warn("Exception trying to get SAML assertion", e);
-        }
-        LOGGER.debug("EXITING: setSAMLAssertion()");
-    }
     
     /**
      * Returns a new STSClient object configured with the properties that have
@@ -586,8 +309,12 @@ public abstract class TrustedRemoteSource {
                 if (httpConduit == null) {
                     LOGGER.info("HTTPConduit was null for stsClient. Unable to configure keystores for stsClient.");
                 } else {
-                    this.configureKeystores(httpConduit, keyStorePath, keyStorePassword,
-                            trustStorePath, trustStorePassword);
+                    if (securitySettingsService != null) {
+                        httpConduit.setTlsClientParameters(securitySettingsService.getTLSParameters());
+                    } else {
+                        LOGGER.debug("Could not get reference to security settings, SSL communications will use system defaults.");
+                    }
+
                 }
             } catch (BusException e) {
                 LOGGER.error("Unable to create sts client.", e);
@@ -655,6 +382,32 @@ public abstract class TrustedRemoteSource {
             }
         }
         return QUESTION_MARK_WSDL;
+    }
+
+    public void setSecuritySettings(SecuritySettingsService securitySettings) {
+        this.securitySettingsService = securitySettings;
+    }
+
+    /**
+     * Set current system TLS Parameters on incoming client
+     * @param client - Client to set the TLS parameters on
+     */
+    protected void setTlsParameters(Client client) {
+        ClientConfiguration clientConfiguration = WebClient.getConfig(client);
+
+        HTTPConduit httpConduit = clientConfiguration.getHttpConduit();
+        if (securitySettingsService != null && httpConduit != null) {
+            TLSClientParameters origParameters = httpConduit.getTlsClientParameters();
+            TLSClientParameters tlsClientParameters = securitySettingsService.getTLSParameters();
+            if (origParameters != null) {
+                tlsClientParameters.setDisableCNCheck(origParameters.isDisableCNCheck());
+            }
+            httpConduit.setTlsClientParameters(tlsClientParameters);
+        } else {
+            LOGGER.debug(
+                    "Could not get a reference to security settings service or reference to client http conduit, using system defaults.");
+        }
+
     }
 
 }

@@ -31,8 +31,10 @@
     <properties>
         <ddf.catalog.app.version>2.7.0-SNAPSHOT</ddf.catalog.app.version>
         <ddf.platform.app.version>2.7.0-SNAPSHOT</ddf.platform.app.version>
+        <ddf.security.app.version>2.6.0-SNAPSHOT</ddf.security.app.version>
         <org.geotools.version>8.4</org.geotools.version>     
-        <handlebars.version>1.1.2</handlebars.version>
+        <handlebars.version>2.0.0</handlebars.version>
+        <antlr.version>4.3</antlr.version>
         <jaxb.annotate.plugin.version>0.6.0</jaxb.annotate.plugin.version>
         <jaxb.visitor.plugin.version>1.13</jaxb.visitor.plugin.version>
         <xpp3.bundle.version>1.1.4c_5</xpp3.bundle.version>
@@ -55,6 +57,11 @@
                 <groupId>ddf.catalog.core</groupId>
                 <artifactId>catalog-core-api-impl</artifactId>
                 <version>${ddf.catalog.app.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ddf.security</groupId>
+                <artifactId>ddf-security-common</artifactId>
+                <version>${ddf.security.app.version}</version>
             </dependency>
             <dependency>
                 <groupId>ddf.catalog.core</groupId>
@@ -105,6 +112,11 @@
                 <groupId>com.github.jknack</groupId>
                 <artifactId>handlebars</artifactId>
                 <version>${handlebars.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-runtime</artifactId>
+                <version>${antlr.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.codice.ddf.spatial</groupId>
@@ -251,6 +263,11 @@
                <groupId>org.apache.tika</groupId>
                <artifactId>tika-core</artifactId>
                <version>${tika.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>xml-apis</groupId>
+                <artifactId>xml-apis</artifactId>
+                <version>1.4.01</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
