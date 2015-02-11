@@ -84,7 +84,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-<<<<<<< HEAD
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
@@ -109,8 +108,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-=======
->>>>>>> 9648ab46634db6ffbcb1dddfae5c9664f2ef57f7
                 <artifactId>maven-site-plugin</artifactId>
                 <version>3.2</version>
                 <dependencies>
