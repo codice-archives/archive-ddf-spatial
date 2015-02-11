@@ -145,15 +145,11 @@
                         <configuration>
                             <backend>html</backend>
                             <doctype>book</doctype>
-<<<<<<< HEAD
                             <sourceHighlighter>coderay</sourceHighlighter>
-=======
->>>>>>> 9648ab46634db6ffbcb1dddfae5c9664f2ef57f7
                         </configuration>
                     </execution>
                 </executions>
                 <configuration>
-<<<<<<< HEAD
                     <sourceDirectory>target/adoc</sourceDirectory>
                     <headerFooter>true</headerFooter>
                     <imagesDir>./images</imagesDir> 
@@ -161,15 +157,12 @@
                     <outputDirectory>target/docs</outputDirectory>
                 </configuration>
             </plugin>
-=======
                     <sourceDirectory>src/main/doc</sourceDirectory>
                     <headerFooter>true</headerFooter>
                     <imagesDir>./images</imagesDir>
                   <outputDirectory>target/docs</outputDirectory>
                 </configuration>
             </plugin>
-
->>>>>>> 9648ab46634db6ffbcb1dddfae5c9664f2ef57f7
             <plugin>
                 <groupId>org.asciidoctor</groupId>
                 <artifactId>asciidoctor-maven-plugin</artifactId>
@@ -182,11 +175,8 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-<<<<<<< HEAD
                     <sourceDirectory>target/adoc</sourceDirectory>
-=======
                     <sourceDirectory>src/main/doc</sourceDirectory>
->>>>>>> 9648ab46634db6ffbcb1dddfae5c9664f2ef57f7
                     <gemPath>${project.build.directory}/gems-provided</gemPath>
                     <requires>
                         <require>asciidoctor-diagram</require>
@@ -194,10 +184,7 @@
                     <!-- Attributes common to all output formats -->
                     <attributes>
                         <sourcedir>${project.build.sourceDirectory}</sourcedir>
-<<<<<<< HEAD
                         <outputDirectory>${project.build.outputDirectory}</outputDirectory>
-=======
->>>>>>> 9648ab46634db6ffbcb1dddfae5c9664f2ef57f7
                     </attributes>
                 </configuration>
                 <executions>
@@ -209,11 +196,8 @@
                         </goals>
                         <configuration>
                             <backend>pdf</backend>
-<<<<<<< HEAD
                             <sourceDirectory>target/adoc</sourceDirectory>
-=======
                             <sourceDirectory>src/main/doc</sourceDirectory>
->>>>>>> 9648ab46634db6ffbcb1dddfae5c9664f2ef57f7
                             <outputDirectory>target/docs</outputDirectory>
                             <!-- WARNING callout bullets don't yet work with CodeRay -->
                             <sourceHighlighter>coderay</sourceHighlighter>
@@ -227,10 +211,7 @@
                     </execution>
                 </executions>
             </plugin>
-<<<<<<< HEAD
         </plugins>
-=======
          </plugins>
->>>>>>> 9648ab46634db6ffbcb1dddfae5c9664f2ef57f7
     </build>
 </project>
