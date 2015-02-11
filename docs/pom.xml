@@ -154,12 +154,6 @@
                     <outputDirectory>target/docs</outputDirectory>
                 </configuration>
             </plugin>
-                    <sourceDirectory>src/main/doc</sourceDirectory>
-                    <headerFooter>true</headerFooter>
-                    <imagesDir>./images</imagesDir>
-                  <outputDirectory>target/docs</outputDirectory>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.asciidoctor</groupId>
                 <artifactId>asciidoctor-maven-plugin</artifactId>
@@ -209,6 +203,5 @@
                 </executions>
             </plugin>
         </plugins>
-         </plugins>
     </build>
 </project>
