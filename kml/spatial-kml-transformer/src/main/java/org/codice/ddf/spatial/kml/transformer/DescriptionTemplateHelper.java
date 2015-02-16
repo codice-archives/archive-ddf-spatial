@@ -139,6 +139,17 @@ public class DescriptionTemplateHelper {
 
     }
 
+    public String resourceUrl(Metacard context) {
+        if (resourceActionProvider != null) {
+            Action action = resourceActionProvider.getAction(context);
+            if (action != null) {
+                return action.getUrl().toString();
+            }
+        }
+        return context.getResourceURI().toString();
+
+    }
+
     public String resourceSizeString(Metacard context) {
         String resourceSize = context.getResourceSize();
         String sizePrefixes = " KMGTPEZYXWVU";
