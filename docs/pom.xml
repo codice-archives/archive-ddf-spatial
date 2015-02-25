@@ -167,7 +167,6 @@
                 </dependencies>
                 <configuration>
                     <sourceDirectory>target/adoc</sourceDirectory>
-                    <sourceDirectory>src/main/doc</sourceDirectory>
                     <gemPath>${project.build.directory}/gems-provided</gemPath>
                     <requires>
                         <require>asciidoctor-diagram</require>
@@ -188,7 +187,6 @@
                         <configuration>
                             <backend>pdf</backend>
                             <sourceDirectory>target/adoc</sourceDirectory>
-                            <sourceDirectory>src/main/doc</sourceDirectory>
                             <outputDirectory>target/docs</outputDirectory>
                             <!-- WARNING callout bullets don't yet work with CodeRay -->
                             <sourceHighlighter>coderay</sourceHighlighter>
