@@ -1,45 +1,82 @@
-Spatial ${project.version} Documentation
-==========
+Spatial Documentation Page
+==========================
 
 # Overview
 
 This page is the central location for documentation related to the DDF Spatial application.
 
-# Stable Version - HTML
+# Documentation
 
-[Extending](http://artifacts.codice.org/service/local/repo_groups/public/content/org/codice/ddf/spatial/docs/${project.version}/docs-${project.version}-Extending.html) Spatial - Developer level architecture documentation.
+## Stable Version - v. 2.7.1
 
-[Integrating](http://artifacts.codice.org/service/local/repo_groups/public/content/org/codice/ddf/spatial/docs/${project.version}/docs-${project.version}-Integrating.html) Spatial - Integrator level documentation.
+<table>
+    <tr>
+        <th>Managing</th>
+        <th>Integrating</th>
+        <th>Extending</th>
+    </tr>
+	<tr>
+		<td>
+			<a href="http://artifacts.codice.org/service/local/artifact/maven/redirect?r=releases&amp;g=org.codice.ddf.spatial&amp;a=docs&amp;c=Managing&amp;e=pdf&amp;v=RELEASE">pdf</a>
+			<a href="http://artifacts.codice.org/service/local/artifact/maven/redirect?r=releases&amp;g=org.codice.ddf.spatial&amp;a=docs&amp;c=Managing&amp;e=html&amp;v=RELEASE">html</a>
+		</td>
+		<td>
+            <a href="http://artifacts.codice.org/service/local/artifact/maven/redirect?r=releases&amp;g=org.codice.ddf.spatial&amp;a=docs&amp;c=Integrating&amp;e=pdf&amp;v=RELEASE">pdf</a>
+            <a href="http://artifacts.codice.org/service/local/artifact/maven/redirect?r=releases&amp;g=org.codice.ddf.spatial&amp;a=docs&amp;c=Integrating&amp;e=html&amp;v=RELEASE">html</a>
+        </td>
+        <td>
+            <a href="http://artifacts.codice.org/service/local/artifact/maven/redirect?r=releases&amp;g=org.codice.ddf.spatial&amp;a=docs&amp;c=Extending&amp;e=pdf&amp;v=RELEASE">pdf</a>
+            <a href="http://artifacts.codice.org/service/local/artifact/maven/redirect?r=releases&amp;g=org.codice.ddf.spatial&amp;a=docs&amp;c=Extending&amp;e=html&amp;v=RELEASE">html</a>
+        </td>
+	</tr>
+</table>
 
-[Managing](http://artifacts.codice.org/service/local/repo_groups/public/content/org/codice/ddf/spatial/docs/${project.version}/docs-${project.version}-Managing.html) Spatial - Administrator level configuration documentation.
+## Development Version - Latest SNAPSHOT version - ${project.version}
 
-# Stable Version - PDF
+<table>
+    <tr>
+        <th>Managing</th>
+        <th>Integrating</th>
+        <th>Extending</th>
+    </tr>
+    <tr>
+        <td>
+            <a href="http://artifacts.codice.org/service/local/artifact/maven/redirect?r=snapshots&amp;g=org.codice.ddf.spatial&amp;a=docs&amp;c=Managing&amp;e=pdf&amp;v=LATEST">pdf</a>
+            <a href="http://artifacts.codice.org/service/local/artifact/maven/redirect?r=snapshots&amp;g=org.codice.ddf.spatial&amp;a=docs&amp;c=Managing&amp;e=html&amp;v=LATEST">html</a>
+        </td>
+        <td>
+            <a href="http://artifacts.codice.org/service/local/artifact/maven/redirect?r=snapshots&amp;g=org.codice.ddf.spatial&amp;a=docs&amp;c=Integrating&amp;e=pdf&amp;v=LATEST">pdf</a>
+            <a href="http://artifacts.codice.org/service/local/artifact/maven/redirect?r=snapshots&amp;g=org.codice.ddf.spatial&amp;a=docs&amp;c=Integrating&amp;e=html&amp;v=LATEST">html</a>
+        </td>
+        <td>
+            <a href="http://artifacts.codice.org/service/local/artifact/maven/redirect?r=snapshots&amp;g=org.codice.ddf.spatial&amp;a=docs&amp;c=Extending&amp;e=pdf&amp;v=LATEST">pdf</a>
+            <a href="http://artifacts.codice.org/service/local/artifact/maven/redirect?r=snapshots&amp;g=org.codice.ddf.spatial&amp;a=docs&amp;c=Extending&amp;e=html&amp;v=LATEST">html</a>
+        </td>
+    </tr>
+</table>
 
-[Extending](http://artifacts.codice.org/service/local/repo_groups/public/content/org/codice/ddf/spatial/docs/${project.version}/docs-${project.version}-Extending.pdf) Spatial - Developer level architecture documentation in .pdf format.
+## Previous Versions
 
-[Integrating](http://artifacts.codice.org/service/local/repo_groups/public/content/org/codice/ddf/spatial/docs/${project.version}/docs-${project.version}-Integrating.pdf) Spatial - Integrator level documentation in .pdf format.
-
-[Managing](http://artifacts.codice.org/service/local/repo_groups/public/content/org/codice/ddf/spatial/docs/${project.version}/docs-${project.version}-Managing.pdf) Spatial - Administrator level configuration documentation 
-# Development Version
-
-[Extending](http://artifacts.codice.org/service/local/artifact/maven/redirect?r=snapshots&g=org.codice.ddf.spatial&a=docs&c=Extending&e=html&v=LATEST) Spatial - Latest SNAPSHOT version of developer documentation.
-
-[Integrating](http://artifacts.codice.org/service/local/artifact/maven/redirect?r=snapshots&g=org.codice.ddf.spatial&a=docs&c=Integrating&e=html&v=LATEST) Spatial - Latest SNAPSHOT version of integrator documentation.
-
-[Managing](http://artifacts.codice.org/service/local/artifact/maven/redirect?r=snapshots&g=org.codice.ddf.spatial&a=docs&c=Managing&e=html&v=LATEST) Spatial - Latest SNAPSHOT version of administrator documentation..
-
-# Development Version - HTML
-
-[Extending](http://artifacts.codice.org/service/local/artifact/maven/redirect?r=snapshots&g=org.codice.ddf.spatial&a=docs&c=Extending&e=html&v=LATEST) Spatial - Latest SNAPSHOT version of developer documentation.
-
-[Integrating](http://artifacts.codice.org/service/local/artifact/maven/redirect?r=snapshots&g=org.codice.ddf.spatial&a=docs&c=Integrating&e=html&v=LATEST) Spatial - Latest SNAPSHOT version of integrator documentation.
-
-[Managing](http://artifacts.codice.org/service/local/artifact/maven/redirect?r=snapshots&g=org.codice.ddf.spatial&a=docs&c=Managing&e=html&v=LATEST) Spatial - Latest SNAPSHOT version of administrator documentation.
-
-# Development Version - PDF
-
-[Extending](http://artifacts.codice.org/service/local/artifact/maven/redirect?r=snapshots&g=org.codice.ddf.spatial&a=docs&c=Extending&e=pdf&v=LATEST) Spatial - Latest SNAPSHOT version of developer documentation in .pdf format.
-
-[Integrating](http://artifacts.codice.org/service/local/artifact/maven/redirect?r=snapshots&g=org.codice.ddf.spatial&a=docs&c=Integrating&e=pdf&v=LATEST) Spatial - Latest SNAPSHOT version of integrator documentation in .pdf format.
-
-[Managing](http://artifacts.codice.org/service/local/artifact/maven/redirect?r=snapshots&g=org.codice.ddf.spatial&a=docs&c=Managing&e=pdf&v=LATEST) Spatial - Latest SNAPSHOT version of administrator documentation in .pdf format.
+<table>
+    <tr>
+        <th>Version</th>
+        <th>Managing</th>
+        <th>Integrating</th>
+        <th>Extending</th>
+    </tr>
+    <tr>
+        <td>2.7.0</td>
+        <td>
+            <a href="http://artifacts.codice.org/service/local/repo_groups/public/content/org/codice/ddf/spatial/docs/2.7.0/docs-2.7.0-Managing.pdf">pdf</a>
+        	<a href="http://artifacts.codice.org/service/local/repo_groups/public/content/org/codice/ddf/spatial/docs/2.7.0/docs-2.7.0-Managing.html">html</a>
+        </td>
+        <td>
+            <a href="http://artifacts.codice.org/service/local/repo_groups/public/content/org/codice/ddf/spatial/docs/2.7.0/docs-2.7.0-Integrating.pdf">pdf</a>
+        	<a href="http://artifacts.codice.org/service/local/repo_groups/public/content/org/codice/ddf/spatial/docs/2.7.0/docs-2.7.0-Integrating.html">html</a>
+        </td>
+        <td>
+            <a href="http://artifacts.codice.org/service/local/repo_groups/public/content/org/codice/ddf/spatial/docs/2.7.0/docs-2.7.0-Extending.pdf">pdf</a>
+            <a href="http://artifacts.codice.org/service/local/repo_groups/public/content/org/codice/ddf/spatial/docs/2.7.0/docs-2.7.0-Extending.pdf">html</a>
+        </td>
+    </tr>
+</table>

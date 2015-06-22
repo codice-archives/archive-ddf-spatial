@@ -1,0 +1,19 @@
+= {branding} Complete Documentation
+include::config.adoc[]
+
+== Managing
+
+The following sections include instructions for installing, maintaining, and administering a {branding} installation.
+
+
+
+== Integrating {branding}
+The following sections include instructions for connecting to or integrating with a {branding} installation.
+
+
+== Extending {branding}
+
+The following sections include an overview of architecture 
+
+include::ExtendingContent.adoc[]
+////
