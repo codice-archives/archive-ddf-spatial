@@ -6,7 +6,7 @@ The {branding} Spatial Application provides KML transformer and a KML network li
 
 This page describes:
 
-* which applications must be installed prior to installing this application. 
+* which applications must be installed prior to installing this application.
 * how to install the {branding} Spatial Application.
 * how to verify if the application was successfully installed.
 * how to uninstall the application
@@ -17,7 +17,7 @@ This page describes:
 Before the {branding} Spatial Application can be installed:
 
 * the {branding} Kernel must be running
-* the {branding} Platform Application must be installed 
+* the {branding} Platform Application must be installed
 * the {branding} Catalog Application must be installed
 
 == Installing
@@ -81,7 +81,7 @@ Example:
 To upgrade an application, complete the following procedure.
 
 . Uninstall the application by following the Uninstall Applications instructions above.
-. Install the new application KAR file by copying the `admin-app-X.Y.kar` file to the `<INSTALL_DIRECTORY>/deploy` directory. 
+. Install the new application KAR file by copying the `admin-app-X.Y.kar` file to the `<INSTALL_DIRECTORY>/deploy` directory.
 . Start the application.
 . Complete the steps in the Verify section above to determine if the upgrade was successful.
 
