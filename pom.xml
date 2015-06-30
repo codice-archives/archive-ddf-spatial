@@ -19,7 +19,7 @@
     <parent>
         <groupId>ddf</groupId>
         <artifactId>ddf-parent</artifactId>
-        <version>3.0.3-SNAPSHOT</version>
+        <version>3.0.3</version>
     </parent>
 
     <groupId>org.codice.ddf.spatial</groupId>
@@ -29,9 +29,9 @@
     <name>DDF :: Spatial</name>
 
     <properties>
-        <ddf.catalog.app.version>2.7.0</ddf.catalog.app.version>
-        <ddf.platform.app.version>2.7.0</ddf.platform.app.version>
-        <ddf.security.app.version>2.7.0</ddf.security.app.version>
+        <ddf.catalog.app.version>2.7.1</ddf.catalog.app.version>
+        <ddf.platform.app.version>2.7.1</ddf.platform.app.version>
+        <ddf.security.app.version>2.7.1</ddf.security.app.version>
         <org.geotools.version>8.4</org.geotools.version>
         <handlebars.version>2.0.0</handlebars.version>
         <antlr.version>4.3</antlr.version>
