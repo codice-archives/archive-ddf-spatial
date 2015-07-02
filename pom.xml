@@ -330,6 +330,7 @@
         <module>csw</module>
         <module>spatial-app</module>
         <module>docs</module>
+        <module>spatial-commands</module>
     </modules>
 
     <repositories>
