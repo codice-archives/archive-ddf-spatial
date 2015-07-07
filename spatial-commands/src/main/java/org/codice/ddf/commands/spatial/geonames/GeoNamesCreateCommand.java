@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.io.PrintStream;
 
 import org.apache.commons.io.FilenameUtils;
@@ -135,14 +136,30 @@ public final class GeoNamesCreateCommand extends OsgiCommandSupport {
 
     private static void indexDocumentsInFile(final IndexWriter indexWriter,
             final String inputTextFileLocation) throws IOException {
+        CONSOLE.println("Indexing " + inputTextFileLocation);
+
         try (final BufferedReader reader = new BufferedReader(
-                new InputStreamReader(new FileInputStream(inputTextFileLocation)))) {
+                new InputStreamReader(new FileInputStream(inputTextFileLocation)));
+            final LineNumberReader lineNumberReader = new LineNumberReader(
+                    new InputStreamReader(new FileInputStream(inputTextFileLocation)))) {
+            // Use the number of lines in the file to track the indexing progress.
+            lineNumberReader.skip(Long.MAX_VALUE);
+            final int lineCount = lineNumberReader.getLineNumber() + 1;
+
+            int currentLine = 0;
+            float progressPercentage = 0.0f;
             for (String line; (line = reader.readLine()) != null;) {
                 // Passing a negative value to preserve empty fields.
                 final String[] fields = line.split("\\t", -1);
                 addDocument(indexWriter, fields);
+                if (currentLine == (int) (progressPercentage * lineCount)) {
+                    CONSOLE.printf("\r%.0f%%", progressPercentage * 100);
+                    CONSOLE.flush();
+                    progressPercentage += 0.05f;
+                }
+                ++currentLine;
             }
-            CONSOLE.println("Indexed " + inputTextFileLocation);
+            CONSOLE.println("\rIndexed " + inputTextFileLocation);
         } catch (ArrayIndexOutOfBoundsException e) {
             CONSOLE.println(
                     inputTextFileLocation + " does not follow the format specified here: " +
