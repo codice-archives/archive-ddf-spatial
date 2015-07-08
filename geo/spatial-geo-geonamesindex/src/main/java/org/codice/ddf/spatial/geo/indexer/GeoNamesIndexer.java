@@ -10,15 +10,14 @@
  * Lesser General Public License for more details. A copy of the GNU Lesser General Public License
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
- */
+ **/
 
-package org.codice.ddf.commands.spatial.geonames;
+package org.codice.ddf.spatial.geo.indexer;
 
 import static org.apache.lucene.index.IndexWriter.MaxFieldLength;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -27,9 +26,6 @@ import java.io.LineNumberReader;
 import java.io.PrintStream;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -37,73 +33,80 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
+import org.codice.ddf.spatial.geo.GeoIndexer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Command(scope = "geonames", name = "create",
-        description = "Creates the local GeoNames index if it doesn't exist and overwrites it if " +
-                "it does.")
-public final class GeoNamesCreateCommand extends OsgiCommandSupport {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GeoNamesCreateCommand.class);
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
 
-    @Argument(index = 0, name = "file_location",
-            description = "Location of the GeoNames .txt file or directory containing GeoNames " +
-                    ".txt files.\n" +
-                    "If it's a directory, the contents of all the .txt files inside will be " +
-                    "added.\n" +
-                    "The files to add should be obtained from " +
-                    "http://download.geonames.org/export/dump and have the format described " +
-                    "there.", required = true)
-    private String inputLocation = null;
+public class GeoNamesIndexer implements GeoIndexer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GeoNamesIndexer.class);
 
     private static final PrintStream CONSOLE = System.out;
 
-    private static final String GEONAMES_INDEX = "geonames-index";
+    private String indexLocation;
 
-    @Override
-    protected Object doExecute() {
-        final String inputFilesLocation = getInputFilesLocation(inputLocation);
-
-        if (inputFilesLocation != null) {
-            buildIndex(inputFilesLocation, true);
-        }
-
-        return null;
+    public void setIndexLocation(final String indexLocation) {
+        this.indexLocation = indexLocation;
     }
 
-    static String getInputFilesLocation(final String fileLocation) {
-        final File file = new File(fileLocation);
-        if (file.isDirectory() || FilenameUtils.isExtension(fileLocation, "txt")) {
+    @Override
+    public void updateIndex(final String fileLocation, final boolean create) {
+        final String inputFileLocation = getInputFileLocation(fileLocation);
+
+        if (inputFileLocation != null) {
+            buildIndex(inputFileLocation, create);
+        }
+    }
+
+    private String getInputFileLocation(final String fileLocation) {
+        if (FilenameUtils.isExtension(fileLocation, "zip")) {
+            // The GeoNames .zip files at http://download.geonames.org/export/dump each contain
+            // a text file with the same name.
+            final String baseName = FilenameUtils.getBaseName(fileLocation);
+            final String textFileName = baseName + ".txt";
+            try {
+                unzipFile(fileLocation, textFileName);
+                return FilenameUtils.getFullPath(fileLocation) + textFileName;
+            } catch (ZipException e) {
+                CONSOLE.printf("Couldn't unzip %s from %s\n", textFileName, fileLocation);
+                return null;
+            }
+        } else if (FilenameUtils.isExtension(fileLocation, "txt")) {
             return fileLocation;
         }
 
-        CONSOLE.println("Input must be a .txt or a directory.");
+        CONSOLE.println("Input must be a .txt or a .zip.");
         return null;
     }
 
-    static void buildIndex(final String inputFilesLocation, final boolean create) {
+    private void unzipFile(final String zipFileLocation, final String textFileName)
+            throws ZipException {
+        final ZipFile zipFile = new ZipFile(zipFileLocation);
+        zipFile.extractFile(textFileName, FilenameUtils.getFullPath(zipFileLocation));
+    }
+
+    private void buildIndex(final String inputFilesLocation, final boolean create) {
         CONSOLE.println("Building index...");
 
         Directory directory;
 
         try {
-            directory = FSDirectory.open(new File(GEONAMES_INDEX));
+            directory = FSDirectory.open(new File(indexLocation));
         } catch (IOException e) {
-            CONSOLE.println("Couldn't open the directory for the index.");
-            LOGGER.error("Error opening the directory for the GeoNames index", e);
+            CONSOLE.printf("Couldn't open the directory for the index, %s\n", indexLocation);
+            LOGGER.error("Error opening the directory for the GeoNames index: {}",
+                    indexLocation, e);
             return;
         }
 
         final StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_30);
         // Try-with-resources to ensure the IndexWriter always gets closed.
-        try (final IndexWriter indexWriter =
-                new IndexWriter(directory, analyzer, create, MaxFieldLength.LIMITED)) {
+        try (final IndexWriter indexWriter = new IndexWriter(directory, analyzer, create,
+                MaxFieldLength.LIMITED)) {
             try {
-                if (FilenameUtils.isExtension(inputFilesLocation, "txt")) {
-                    indexDocumentsInFile(indexWriter, inputFilesLocation);
-                } else {
-                    indexFilesInDirectory(indexWriter, new File(inputFilesLocation));
-                }
+                indexDocumentsInFile(indexWriter, inputFilesLocation);
             } catch (ArrayIndexOutOfBoundsException | IOException e) {
                 // Need to roll back here before the IndexWriter is closed at the end of the try
                 // block.
@@ -119,29 +122,14 @@ public final class GeoNamesCreateCommand extends OsgiCommandSupport {
         CONSOLE.println("Index update successful.");
     }
 
-    private static void indexFilesInDirectory(final IndexWriter indexWriter, final File folder)
-            throws IOException {
-        final FileFilter fileFilter = new FileFilter() {
-            @Override
-            public boolean accept(final File file) {
-                return FilenameUtils.isExtension(file.getAbsolutePath(), "txt") &&
-                        !file.isHidden() && !file.isDirectory();
-            }
-        };
-
-        for (final File fileEntry : folder.listFiles(fileFilter)) {
-            indexDocumentsInFile(indexWriter, fileEntry.getAbsolutePath());
-        }
-    }
-
-    private static void indexDocumentsInFile(final IndexWriter indexWriter,
+    private void indexDocumentsInFile(final IndexWriter indexWriter,
             final String inputTextFileLocation) throws IOException {
         CONSOLE.println("Indexing " + inputTextFileLocation);
 
         try (final BufferedReader reader = new BufferedReader(
                 new InputStreamReader(new FileInputStream(inputTextFileLocation)));
-            final LineNumberReader lineNumberReader = new LineNumberReader(
-                    new InputStreamReader(new FileInputStream(inputTextFileLocation)))) {
+             final LineNumberReader lineNumberReader = new LineNumberReader(
+                new InputStreamReader(new FileInputStream(inputTextFileLocation)))) {
             // Use the number of lines in the file to track the indexing progress.
             lineNumberReader.skip(Long.MAX_VALUE);
             final int lineCount = lineNumberReader.getLineNumber() + 1;
@@ -161,10 +149,8 @@ public final class GeoNamesCreateCommand extends OsgiCommandSupport {
             }
             CONSOLE.println("\rIndexed " + inputTextFileLocation);
         } catch (ArrayIndexOutOfBoundsException e) {
-            CONSOLE.println(
-                    inputTextFileLocation + " does not follow the format specified here: " +
-                    "http://download.geonames.org/export/dump/readme.txt"
-            );
+            CONSOLE.println(inputTextFileLocation + " does not follow the format specified here: " +
+                            "http://download.geonames.org/export/dump/readme.txt");
             LOGGER.info("GeoNames text file is missing a field", e);
             throw e;
         } catch (FileNotFoundException e) {
@@ -178,7 +164,7 @@ public final class GeoNamesCreateCommand extends OsgiCommandSupport {
         }
     }
 
-    private static void addDocument(final IndexWriter indexWriter, final String[] fields)
+    private void addDocument(final IndexWriter indexWriter, final String[] fields)
             throws IOException {
         final Document document = new Document();
         document.add(new Field("id", fields[0], Field.Store.YES, Field.Index.NOT_ANALYZED));

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 /**
  * Copyright (c) Codice Foundation
@@ -10,17 +11,20 @@
  * <http://www.gnu.org/licenses/lgpl.html>.
  *
  **/
--->
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-        <command name="geonames/update">
-            <action class="org.codice.ddf.commands.spatial.geonames.GeoNamesUpdateCommand">
-                <property name="geoIndexer" ref="geoIndexer"/>
-            </action>
-        </command>
-    </command-bundle>
+ -->
+<metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0">
 
-    <reference id="geoIndexer" interface="org.codice.ddf.spatial.geo.GeoIndexer"/>
+    <OCD name="GeoNames Indexer" id="org.codice.ddf.spatial.geonames.properties">
+        <AD
+                description="Specifies the directory to hold the GeoNames index."
+                name="Index Location" id="indexLocation" required="true" type="String"
+                default="data/geonames-index"
+                />
+    </OCD>
 
-</blueprint>
+    <Designate pid="org.codice.ddf.spatial.geonames.properties">
+        <Object ocdref="org.codice.ddf.spatial.geonames.properties"/>
+    </Designate>
+
+</metatype:MetaData>
