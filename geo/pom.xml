@@ -25,11 +25,12 @@
 
     <artifactId>geo</artifactId>
     <name>DDF :: Spatial :: Geo</name>
+    <packaging>pom</packaging>
+    <version>2.8.0-SNAPSHOT</version>
+
     <modules>
         <module>spatial-geo-api</module>
         <module>spatial-geo-geonamesindex</module>
     </modules>
-    <packaging>pom</packaging>
-    <version>2.8.0-SNAPSHOT</version>
 
 </project>
