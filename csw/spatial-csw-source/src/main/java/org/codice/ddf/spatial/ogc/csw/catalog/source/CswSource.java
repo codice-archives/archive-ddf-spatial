@@ -1277,20 +1277,20 @@ public class CswSource extends MaskableImpl implements FederatedSource, Connecte
      * Sets the {@link ddf.catalog.filter.FilterDelegate} used by the CswSource. May be overridden
      * in order to provide a custom ddf.catalog.filter.FilterDelegate implementation.
      *
-     * @param cswRecordMetacardType
+     * @param metacardType
      * @param getRecordsOp
      * @param filterCapabilities
      * @param outputFormatValues
      * @param resultTypesValues
      * @param cswSourceConfiguration
      */
-    protected void setFilterDelegate(CswRecordMetacardType cswRecordMetacardType,
+    protected void setFilterDelegate(MetacardType metacardType,
             Operation getRecordsOp, FilterCapabilities filterCapabilities,
             DomainType outputFormatValues, DomainType resultTypesValues,
             CswSourceConfiguration cswSourceConfiguration) {
         LOGGER.trace("Setting cswFilterDelegate to default CswFilterDelegate");
 
-        cswFilterDelegate = new CswFilterDelegate(cswRecordMetacardType, getRecordsOp,
+        cswFilterDelegate = new CswFilterDelegate(metacardType, getRecordsOp,
                 filterCapabilities, outputFormatValues, resultTypesValues, cswSourceConfiguration);
     }
 
